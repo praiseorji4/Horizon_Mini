@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:macro name="mini_gazebo" params="prefix">
+        <gazebo>
+            <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+                <parameters>$(find mini_bringup)/config/mini_controllers.yaml</parameters>
+            </plugin>
+        </gazebo>
+
+
+        <gazebo>
+            <plugin filename="gz-sim-sensors-system" name="gz::sim::systems::Sensors">
+                <render_engine>ogre2</render_engine>
+            </plugin>
+        </gazebo>
+
+        <gazebo reference="${prefix}lidar_link">
+            <sensor name="${prefix}lidar_sensor" type="gpu_lidar">
+                <topic>/lidar</topic> 
+                <update_rate>10</update_rate>
+                <always_on>true</always_on>
+                <visualize>true</visualize>
+                <lidar>
+                    <scan>
+                        <horizontal>
+                            <samples>720</samples>
+                            <resolution>1</resolution>
+                            <min_angle>-3.14159</min_angle>
+                            <max_angle>3.14159</max_angle>
+                        </horizontal>
+                    </scan>
+                    <range>
+                        <min>0.2</min> 
+                        <max>30.0</max>
+                        <resolution>0.01</resolution>
+                    </range>
+                    <noise>
+                        <type>gaussian</type>
+                        <mean>0.0</mean>
+                        <stddev>0.01</stddev>
+                    </noise>
+                </lidar>
+                <gz_frame_id>${prefix}lidar_link</gz_frame_id>
+            </sensor>
+        </gazebo>
+    </xacro:macro>
+</robot>

@@ -1,0 +1,9 @@
+<library path="mini_hardware">
+  <class name="mini_hardware/DiffDriveMiniHardware"
+         type="mini_hardware::DiffDriveMiniHardware"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      Diff drive hardware interface for Horizon Mini robot
+    </description>
+  </class>
+</library>

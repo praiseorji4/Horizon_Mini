@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+    <xacro:property name="lidar_xoff" value="0.032966" />
+    <xacro:property name="lidar_yoff" value="0.0" />
+    <xacro:property name="lidar_zoff" value="0.083437" />
+
+    <xacro:property name="lidar_mass" value="0.10321" />
+    <xacro:property name="lidar_length" value="0.043" />
+    <xacro:property name="lidar_width" value="0.04629" />
+    <xacro:property name="lidar_height" value="0.0348" />
+    <xacro:property name="com_x" value="-0.000082" />     <!--Center of Mass-->
+    <xacro:property name="com_y" value="-0.000041" /> 
+    <xacro:property name="com_z" value="0.010541" /> 
+
+    <xacro:macro name="mini_lidar" params="prefix">
+        <link name="${prefix}lidar_link">
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 ${pi/2}"/>
+                <!-- <geometry>
+                    <mesh filename="file://$(find mini_description)/meshes/lidar.stl" scale="0.001 0.001 0.001"/>
+                </geometry> -->
+                <geometry>
+                    <mesh filename="package://mini_description/meshes/lidar.stl" scale="0.001 0.001 0.001"/>
+                </geometry>
+                <material name="black">
+                        <color rgba="0.0 0.0 0.0 1.0"/>
+                </material>
+            </visual>
+
+            <inertial>
+                <origin xyz="${com_x} ${com_y} ${com_z}" rpy="0 0 0"/>
+                <mass value="${lidar_mass*1.25}"/>
+                <inertia ixx="${(1/12) * lidar_mass * ((lidar_width * lidar_width) + (lidar_height * lidar_height))}"  ixy="0.0"  ixz="0.0"  
+                            iyy="${(1/12) * lidar_mass * ((lidar_length * lidar_length) + (lidar_height * lidar_height))}"  iyz="0.0" 
+                            izz="${(1/12) * lidar_mass * ((lidar_length * lidar_length) + (lidar_width * lidar_width))}"/>
+            </inertial>
+        </link>
+
+        <joint name="base_lidar_joint" type="fixed">
+            <origin xyz="${lidar_xoff} ${lidar_yoff} ${lidar_zoff}" rpy="0.0 0.0 0.0"/>
+            <parent link="base_link"/>
+            <child link="lidar_link"/>
+        </joint>
+    </xacro:macro>
+</robot>

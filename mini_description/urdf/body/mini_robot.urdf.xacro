@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="mini_robot">
+    
+    <xacro:property name="M_PI" value="3.1415926535897931" />
+    <xacro:arg name="robot_name" default="mini_robot"/>
+    <xacro:arg name="prefix" default=""/>
+    <xacro:arg name="use_gazebo" default="true"/>
+
+    <xacro:include filename="$(find mini_description)/urdf/mini_common_materials.xacro" />
+    <xacro:include filename="$(find mini_description)/urdf/body/mini_chassis.urdf.xacro" />
+    <xacro:include filename="$(find mini_description)/urdf/body/mini_wheels.urdf.xacro" />
+    <xacro:include filename="$(find mini_description)/urdf/sensors/mini_lidar.urdf.xacro" />
+    <xacro:include filename="$(find mini_description)/urdf/gazebo/mini_gazebo.urdf.xacro"/>
+    <xacro:include filename="$(find mini_description)/urdf/ros2_control/mini_ros2_control.xacro"/>
+
+
+    
+    <xacro:mini_ros2_control prefix="$(arg prefix)" use_gazebo="$(arg use_gazebo)" />
+
+    <xacro:if value="$(arg use_gazebo)">
+        <xacro:mini_gazebo prefix="$(arg prefix)" />
+    </xacro:if>
+    
+    <xacro:mini_chassis
+    prefix="$(arg prefix)" />
+
+    <xacro:mini_wheels
+        prefix="$(arg prefix)"
+        side="front_right_wheel"
+        x_reflect="1"
+        y_reflect="-1"/>
+
+    <xacro:mini_wheels
+        prefix="$(arg prefix)"
+        side="front_left_wheel"
+        x_reflect="1"
+        y_reflect="1"/>
+
+    <xacro:mini_wheels
+        prefix="$(arg prefix)"
+        side="rear_left_wheel"
+        x_reflect="-1"
+        y_reflect="1"/>
+
+    <xacro:mini_wheels
+        prefix="$(arg prefix)"
+        side="rear_right_wheel"
+        x_reflect="-1"
+        y_reflect="-1"/>
+
+    <xacro:mini_lidar
+        prefix="$(arg prefix)"/>
+</robot>
