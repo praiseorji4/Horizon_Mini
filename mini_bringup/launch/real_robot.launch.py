@@ -89,6 +89,15 @@ def generate_launch_description():
         ]
     )
 
+    # ── Camera ────────────────────────────────────────────────────────────
+    camera_node = Node(
+        package='v4l2_camera',
+        executable='v4l2_camera_node',
+        name='v4l2_camera',
+        output='screen',
+        parameters=[{'image_size': [640, 480]}]
+    )
+
     return LaunchDescription([
         lidar_node,
         node_robot_state_publisher,
@@ -96,4 +105,5 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         diff_drive_controller_spawner,
         twist_stamper,
+        camera_node,
     ])
