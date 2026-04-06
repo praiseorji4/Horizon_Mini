@@ -1,7 +1,7 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import AppendEnvironmentVariable, IncludeLaunchDescription, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command
@@ -51,7 +51,7 @@ def generate_launch_description():
             '/cmd_vel@geometry_msgs/msg/Twist]gz.msgs.Twist',
             '/odom@nav_msgs/msg/Odometry[gz.msgs.Odometry',
             # '/tf@tf2_msgs/msg/TFMessage[gz.msgs.Pose_V',
-            '/lidar@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            '/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
         ],
         output='screen',
         parameters=[{'use_sim_time': True}]
@@ -111,26 +111,26 @@ def generate_launch_description():
 
     mini_bringup_dir = get_package_share_directory('mini_bringup')
     mini_description_dir = get_package_share_directory('mini_description')
-    # slam_toolbox_dir = get_package_share_directory('slam_toolbox')
+    slam_toolbox_dir = get_package_share_directory('slam_toolbox')
     # # Construction of the variable
-    # nav2_launch_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
+    nav2_launch_dir = os.path.join(get_package_share_directory('nav2_bringup'), 'launch')
 
     # # Path to SLAM parameters
-    # slam_params_file = os.path.join(mini_bringup_dir, 'config', 'mapper_params_online_async.yaml')
+    slam_params_file = os.path.join(mini_bringup_dir, 'config', 'mapper_params_online_async.yaml')
     
     # Path to RViz configuration
     rviz_config_file = os.path.join(mini_description_dir, 'rviz', 'display.rviz')
 
     # 7. Include SLAM Toolbox
-    # slam_toolbox = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(slam_toolbox_dir, 'launch', 'online_async_launch.py')
-    #     ),
-    #     launch_arguments={
-    #         'slam_params_file': slam_params_file,
-    #         'use_sim_time': 'true'
-    #     }.items()
-    # )
+    slam_toolbox = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(slam_toolbox_dir, 'launch', 'online_async_launch.py')
+        ),
+        launch_arguments={
+            'slam_params_file': slam_params_file,
+            'use_sim_time': 'true'
+        }.items()
+    )
 
     # 8. RViz2 Node
     rviz_node = Node(
@@ -141,22 +141,26 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}]
     )
 
-    # nav2_params_path = os.path.join(
-    #         get_package_share_directory('mini_bringup'),
-    #         'config',
-    #         'nav2_params.yaml'
-    #     )
+    nav2_params_path = os.path.join(
+            get_package_share_directory('mini_bringup'),
+            'config',
+            'nav2_params.yaml'
+        )
 
-    # nav2 = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(os.path.join(nav2_launch_dir, 'navigation_launch.py')),
-    #     launch_arguments={
-    #         'use_sim_time': 'true',
-    #         'params_file': nav2_params_path 
-    #     }.items(),
+    nav2 = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(os.path.join(nav2_launch_dir, 'navigation_launch.py')),
+        launch_arguments={
+            'use_sim_time': 'true',
+            'params_file': nav2_params_path 
+        }.items(),
  
-    # )
+    )
     
     return LaunchDescription([
+        AppendEnvironmentVariable(
+            'GZ_SIM_RESOURCE_PATH',
+            os.path.join(get_package_share_directory('mini_description'), '..')
+        ),
         node_robot_state_publisher,
         gazebo,
         bridge,
@@ -168,7 +172,7 @@ def generate_launch_description():
                 on_exit=[load_joint_state_broadcaster, load_diff_drive_controller],
             )
         ),
-        # slam_toolbox,
+        slam_toolbox,
         rviz_node, 
-        # nav2
+        nav2
     ])

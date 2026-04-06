@@ -1,21 +1,36 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import Command
 from launch_ros.actions import Node
 
 def generate_launch_description():
     pkg_description = get_package_share_directory('mini_description')
     pkg_bringup = get_package_share_directory('mini_bringup')
-    pkg_lidar = get_package_share_directory('oradar_lidar')
 
-    # ── LiDAR (includes msms200_scan.launch.py) ──────────────────────────
-    lidar_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([
-            os.path.join(pkg_lidar, 'launch', 'ms200_scan.launch.py')
-        ])
+    # ── LiDAR ─────────────────────────────────────────────────────────────
+    # Defined directly (not via ms200_scan.launch.py) to set the correct
+    # scan_topic (/scan) and frame_id (lidar_link matching the URDF).
+    # The ms200 launch's static TF is omitted — robot_state_publisher
+    # already publishes base_link → lidar_link from the URDF.
+    lidar_node = Node(
+        package='oradar_lidar',
+        executable='oradar_scan',
+        name='MS200',
+        output='screen',
+        parameters=[
+            {'device_model': 'MS200'},
+            {'frame_id': 'lidar_link'},
+            {'scan_topic': '/scan'},
+            {'port_name': '/dev/ttyACM1'},
+            {'baudrate': 230400},
+            {'angle_min': 0.0},
+            {'angle_max': 360.0},
+            {'range_min': 0.05},
+            {'range_max': 20.0},
+            {'clockwise': False},
+            {'motor_speed': 10},
+        ]
     )
 
     # ── Robot description ─────────────────────────────────────────────────
@@ -75,7 +90,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-        lidar_launch,                        # <-- LiDAR included here
+        lidar_node,
         node_robot_state_publisher,
         controller_manager,
         joint_state_broadcaster_spawner,

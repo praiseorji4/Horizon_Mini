@@ -16,10 +16,10 @@
 
         <gazebo reference="${prefix}lidar_link">
             <sensor name="${prefix}lidar_sensor" type="gpu_lidar">
-                <topic>/lidar</topic> 
+                <topic>/scan</topic> 
                 <update_rate>10</update_rate>
                 <always_on>true</always_on>
-                <visualize>true</visualize>
+                <visualize>false</visualize>
                 <lidar>
                     <scan>
                         <horizontal>

@@ -1,24 +1,112 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+    <xacro:property name="rod_radius" value="0.0025" />
+    <xacro:property name="rod_width" value="0.012" />
+
+    <xacro:property name="rod_xoff" value="0.061" />
+    <xacro:property name="rod_yoff" value="0.077" />
+    <xacro:property name="rod_zoff" value="-0.017003" />
+
+    <xacro:property name="rear_rod_xoff" value="0.050" />
+    <xacro:property name="rear_rod_yoff" value="0.077" />
+
+    
     <xacro:property name="wheel_radius" value="0.022" />
     <xacro:property name="wheel_width" value="0.02" />
-    <xacro:property name="wheel_mass" value="0.04" />
+    <xacro:property name="wheel_mass" value="0.4" />
+
+    <xacro:property name="wheel_yoff" value="${wheel_width/2}" />
 
 
-    <xacro:property name="wheel_xoff" value="0.076123" />
-    <xacro:property name="wheel_yoff" value="0.1010" />
+    <!-- <xacro:property name="wheel_xoff" value="0.061" />
+    <xacro:property name="wheel_yoff" value="0.087" />
     <xacro:property name="wheel_zoff" value="-0.017003" />
 
-    <xacro:macro name="mini_wheels" params="prefix side x_reflect y_reflect">
+    <xacro:property name="rear_wheel_xoff" value="0.050" />
+    <xacro:property name="rear_wheel_yoff" value="0.087" /> -->
+
+    <xacro:macro name="front_wheel_rods" params="prefix side x_reflect y_reflect">
+        <link name="${prefix}${side}_link">
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 0.0"/>
+                <geometry>
+                    <cylinder radius="${rod_radius}" length="${rod_width}"/>
+                </geometry>
+                <material name="black">
+                        <color rgba="0.5 0.5 0.5 0.5"/>
+                </material>
+            </visual>
+
+            <collision>
+                <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+                <geometry>
+                    <cylinder radius="${rod_radius}" length="${rod_width}"/>
+                </geometry>
+            </collision>
+
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="${wheel_mass}"/>
+                <inertia
+                ixx="${(wheel_mass/12.0) * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}" ixy="0" ixz="0"
+                iyy="${(wheel_mass/2.0) * (wheel_radius*wheel_radius)}" iyz="0"
+                izz="${(wheel_mass/12.0) * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"/>
+            </inertial>
+        </link>
+
+        <joint name="${side}_joint" type="fixed">
+            <origin xyz="${x_reflect*rod_xoff} ${y_reflect*rod_yoff} ${rod_zoff}" rpy="0.0 0.0 0.0"/>
+            <parent link="${prefix}base_link"/>
+            <child link="${prefix}${side}_link"/>
+        </joint>
+    </xacro:macro>
+
+    <xacro:macro name="rear_wheel_rods" params="prefix side x_reflect y_reflect">
+        <link name="${prefix}${side}_link">
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 0.0"/>
+                <geometry>
+                    <cylinder radius="${rod_radius}" length="${rod_width}"/>
+                </geometry>
+                <material name="black">
+                        <color rgba="0.5 0.5 0.5 0.5"/>
+                </material>
+            </visual>
+
+            <collision>
+                <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+                <geometry>
+                    <cylinder radius="${rod_radius}" length="${rod_width}"/>
+                </geometry>
+            </collision>
+
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="${wheel_mass}"/>
+                <inertia
+                ixx="${(wheel_mass/12.0) * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}" ixy="0" ixz="0"
+                iyy="${(wheel_mass/2.0) * (wheel_radius*wheel_radius)}" iyz="0"
+                izz="${(wheel_mass/12.0) * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"/>
+            </inertial>
+        </link>
+
+        <joint name="${side}_joint" type="fixed">
+            <origin xyz="${x_reflect*rear_rod_xoff} ${y_reflect*rear_rod_yoff} ${rod_zoff}" rpy="0.0 0.0 0.0"/>
+            <parent link="${prefix}base_link"/>
+            <child link="${prefix}${side}_link"/>
+        </joint>
+    </xacro:macro>
+
+    <xacro:macro name="front_mini_wheels" params="prefix side x_reflect y_reflect">
         <link name="${prefix}${side}_link">
             <visual>
                 <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 0.0"/>
                 <geometry>
                     <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
                 </geometry>
-                <material name="black">
-                        <color rgba="0.0 0.0 0.0 1.0"/>
+                <material name="grey">
+                        <color rgba="0.5 0.5 0.5 0.5"/>
                 </material>
             </visual>
 
@@ -40,10 +128,49 @@
         </link>
 
         <joint name="${side}_joint" type="continuous">
-            <origin xyz="${x_reflect*wheel_xoff} ${y_reflect*wheel_yoff} ${wheel_zoff}" rpy="0.0 0.0 0.0"/>
-            <parent link="base_link"/>
-            <child link="${side}_link"/>
+            <origin xyz="0 ${y_reflect*wheel_yoff} 0" rpy="0.0 0.0 0.0"/>
+            <parent link="${prefix}${side}_rod_link"/>
+            <child link="${prefix}${side}_link"/>
             <axis xyz="0.0 1.0 0.0"/>
         </joint>
     </xacro:macro>
+
+    
+    <xacro:macro name="rear_mini_wheels" params="prefix side x_reflect y_reflect">
+        <link name="${prefix}${side}_link">
+            <visual>
+                <origin xyz="0.0 0.0 0.0" rpy="${pi/2} 0.0 0.0"/>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                </geometry>
+                <material name="grey">
+                        <color rgba="0.5 0.5 0.5 0.5"/>
+                </material>
+            </visual>
+
+            <collision>
+                <origin xyz="0 0 0" rpy="${pi/2} 0 0"/>
+                <geometry>
+                    <cylinder radius="${wheel_radius}" length="${wheel_width}"/>
+                </geometry>
+            </collision>
+
+            <inertial>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <mass value="${wheel_mass}"/>
+                <inertia
+                ixx="${(wheel_mass/12.0) * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}" ixy="0" ixz="0"
+                iyy="${(wheel_mass/2.0) * (wheel_radius*wheel_radius)}" iyz="0"
+                izz="${(wheel_mass/12.0) * (3*wheel_radius*wheel_radius + wheel_width*wheel_width)}"/>
+            </inertial>
+        </link>
+
+        <joint name="${side}_joint" type="continuous">
+            <origin xyz="0 ${y_reflect*wheel_yoff} 0" rpy="0.0 0.0 0.0"/>
+            <parent link="${prefix}${side}_rod_link"/>
+            <child link="${prefix}${side}_link"/>
+            <axis xyz="0.0 1.0 0.0"/>
+        </joint>
+    </xacro:macro>
+
 </robot>

@@ -24,25 +24,54 @@
     <xacro:mini_chassis
     prefix="$(arg prefix)" />
 
-    <xacro:mini_wheels
-        prefix="$(arg prefix)"
-        side="front_right_wheel"
-        x_reflect="1"
-        y_reflect="-1"/>
 
-    <xacro:mini_wheels
+    <xacro:front_wheel_rods
+            prefix="$(arg prefix)"
+            side="front_right_wheel_rod"
+            x_reflect="1"
+            y_reflect="-1"/>
+
+    <xacro:front_wheel_rods
+            prefix="$(arg prefix)"
+            side="front_left_wheel_rod"
+            x_reflect="1"
+            y_reflect="1"/>
+
+    <xacro:rear_wheel_rods
+        prefix="$(arg prefix)"
+        side="rear_left_wheel_rod"
+        x_reflect="-1"
+        y_reflect="1"/>
+
+
+
+    <xacro:rear_wheel_rods
+        prefix="$(arg prefix)"
+        side="rear_right_wheel_rod"
+        x_reflect="-1"
+        y_reflect="-1"/>
+    
+    <xacro:front_mini_wheels
+            prefix="$(arg prefix)"
+            side="front_right_wheel"
+            x_reflect="1"
+            y_reflect="-1"/>
+
+    <xacro:front_mini_wheels
         prefix="$(arg prefix)"
         side="front_left_wheel"
         x_reflect="1"
         y_reflect="1"/>
 
-    <xacro:mini_wheels
+    
+
+    <xacro:rear_mini_wheels
         prefix="$(arg prefix)"
         side="rear_left_wheel"
         x_reflect="-1"
         y_reflect="1"/>
 
-    <xacro:mini_wheels
+    <xacro:rear_mini_wheels
         prefix="$(arg prefix)"
         side="rear_right_wheel"
         x_reflect="-1"
